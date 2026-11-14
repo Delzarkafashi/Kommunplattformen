@@ -1,0 +1,9 @@
+# Lokala arbetsregler
+/AGENTS.md
+/docs/
+
+# Genererade Java- och Vaadin-filer
+*.class
+/kommun-system/target/
+/kommun-system/src/main/frontend/generated/
+/kommun-system/src/main/frontend/index.html
