@@ -1,7 +1,7 @@
 package se.kommun;
 
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -9,21 +9,26 @@ import com.vaadin.flow.router.Route;
 
 @Route("")
 public class MainView extends VerticalLayout {
-    TextField beskrivning = new TextField("Avvikelsetext");
-    Paragraph resultat = new Paragraph("Ingen förhandsvisning ännu.");
+    private AvvikelseService service = new AvvikelseService();
+    private TextField beskrivning = new TextField("Fiktiv avvikelse");
+    private Paragraph resultat = new Paragraph();
+    private Paragraph meddelande = new Paragraph();
 
     public MainView() {
-        Button visa = new Button("Förhandsvisa");
-        visa.addClickListener(event -> visaForhandsvisning());
-        add(new H2("Kommunens verksamhetssystem"), beskrivning, visa, resultat);
+        Button visa = new Button("Förhandsvisa", event -> forhandsvisa());
+        add(new H1("Kommunens verksamhetssystem"),
+            beskrivning, visa, meddelande, resultat);
     }
 
-    void visaForhandsvisning() {
-        String text = beskrivning.getValue().trim();
-        if (text.isEmpty()) {
-            resultat.setText("Skriv en fiktiv avvikelsetext.");
+    private void forhandsvisa() {
+        String text = beskrivning.getValue();
+        if (service.arTom(text)) {
+            meddelande.setText("Beskrivning saknas");
         } else {
-            resultat.setText("Fiktiv avvikelse: " + text);
+            Avvikelse avvikelse = service.skapa(text);
+            resultat.setText(avvikelse.getBeskrivning()
+                + " – " + avvikelse.getStatus());
+            meddelande.setText("");
         }
     }
 }
