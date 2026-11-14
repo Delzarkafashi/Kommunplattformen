@@ -1,17 +1,22 @@
 package se.kommun;
 
 public class Avvikelse {
-    private String beskrivning;
-    private String status;
+    private final int id;
+    private final String beskrivning;
+    private String status = "Öppen";
     private Enhet enhet;
     private Medarbetare ansvarig;
 
-    public Avvikelse(String beskrivning, String status,
+    public Avvikelse(int id, String beskrivning,
                      Enhet enhet, Medarbetare ansvarig) {
+        this.id = id;
         this.beskrivning = beskrivning;
-        this.status = status;
         this.enhet = enhet;
         this.ansvarig = ansvarig;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getBeskrivning() {
@@ -28,5 +33,17 @@ public class Avvikelse {
 
     public Medarbetare getAnsvarig() {
         return ansvarig;
+    }
+
+    public boolean andraStatus(String nyStatus) {
+        if ("Öppen".equals(nyStatus)) {
+            status = nyStatus;
+            return true;
+        }
+        if ("Avslutad".equals(nyStatus)) {
+            status = nyStatus;
+            return true;
+        }
+        return false;
     }
 }

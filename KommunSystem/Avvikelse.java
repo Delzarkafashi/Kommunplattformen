@@ -1,15 +1,20 @@
 public class Avvikelse {
-    private String beskrivning;
-    private String status;
+    private final int id;
+    private final String beskrivning;
+    private String status = "Öppen";
     private Enhet enhet;
     private Medarbetare ansvarig;
 
-    public Avvikelse(String beskrivning, String status,
+    public Avvikelse(int id, String beskrivning,
                      Enhet enhet, Medarbetare ansvarig) {
+        this.id = id;
         this.beskrivning = beskrivning;
-        this.status = status;
         this.enhet = enhet;
         this.ansvarig = ansvarig;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getBeskrivning() {
@@ -28,10 +33,16 @@ public class Avvikelse {
         return ansvarig;
     }
 
-    public void uppdateraStatus(String nyStatus) {
+    public boolean andraStatus(String nyStatus) {
+        if ("Öppen".equals(nyStatus)) {
+            this.status = nyStatus;
+            return true;
+        }
         if ("Avslutad".equals(nyStatus)) {
             this.status = nyStatus;
+            return true;
         }
+        return false;
     }
 
     public String hamtaText() {

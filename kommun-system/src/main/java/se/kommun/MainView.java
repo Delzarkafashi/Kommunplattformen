@@ -13,33 +13,26 @@ public class MainView extends VerticalLayout {
     private Enhet enhet = new Enhet("Biblioteket");
     private Medarbetare ansvarig = new Medarbetare("Kim");
     private TextField beskrivning = new TextField("Fiktiv avvikelse");
-    private Paragraph resultat = new Paragraph();
     private Paragraph meddelande = new Paragraph();
     private Paragraph antal = new Paragraph();
     private VerticalLayout listyta = new VerticalLayout();
 
     public MainView() {
-        Medarbetare sam = new Medarbetare("Sam");
-        service.laggTill(new Avvikelse("Trasig lampa", "Öppen", enhet, ansvarig));
-        service.laggTill(new Avvikelse("Halt entrégolv", "Avslutad", enhet, sam));
-
-        Button visa = new Button("Förhandsvisa", event -> forhandsvisa());
+        Button registrera = new Button("Registrera", event -> registrera());
         Button uppdatera = new Button("Uppdatera visning", event -> visaAvvikelser());
         add(new H1("Kommunens verksamhetssystem"),
-            beskrivning, visa, meddelande, resultat, uppdatera, antal, listyta);
+            beskrivning, registrera, meddelande, uppdatera, antal, listyta);
         visaAvvikelser();
     }
 
-    private void forhandsvisa() {
-        String text = beskrivning.getValue();
-        if (service.arTom(text)) {
-            meddelande.setText("Beskrivning saknas");
+    private void registrera() {
+        if (service.registrera(beskrivning.getValue(), enhet, ansvarig)) {
+            meddelande.setText("Avvikelsen registrerades i minnet.");
+            beskrivning.setValue("");
         } else {
-            Avvikelse avvikelse = service.skapa(text, enhet, ansvarig);
-            resultat.setText(avvikelse.getBeskrivning()
-                + " – " + avvikelse.getStatus());
-            meddelande.setText("");
+            meddelande.setText("Beskrivning saknas.");
         }
+        visaAvvikelser();
     }
 
     private void visaAvvikelser() {
@@ -49,9 +42,21 @@ public class MainView extends VerticalLayout {
             listyta.add(new Paragraph("Inga avvikelser"));
         } else {
             for (Avvikelse avvikelse : service.hamtaAlla()) {
-                listyta.add(new Paragraph(avvikelse.getBeskrivning()
-                    + " | Status: " + avvikelse.getStatus()));
+                Paragraph text = new Paragraph(AvvikelsePresentation.rad(
+                    avvikelse.getId(), avvikelse.getBeskrivning(), avvikelse.getStatus()));
+                Button avsluta = new Button("Avsluta avvikelse " + avvikelse.getId(),
+                    event -> avsluta(avvikelse.getId()));
+                listyta.add(text, avsluta);
             }
         }
+    }
+
+    private void avsluta(int id) {
+        if (service.uppdateraStatus(id, "Avslutad")) {
+            meddelande.setText("Avvikelse " + id + " avslutades.");
+        } else {
+            meddelande.setText("Avvikelse " + id + " hittades inte.");
+        }
+        visaAvvikelser();
     }
 }
